@@ -19,7 +19,18 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('document', 14)->unique();
+            $table->string('phone', 25)->nullable();
+            $table->string('state', 2)->nullable();
+            $table->string('city')->nullable();
+            $table->string('neighborhood')->nullable();
+            $table->string('street')->nullable();
+            $table->string('number')->nullable();
+            $table->string('zipcode', 10)->nullable();
+            $table->string('complement')->nullable();
+            $table->boolean('archived')->default(false);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
