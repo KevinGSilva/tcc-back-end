@@ -4,6 +4,7 @@ use App\Http\Controllers\api\ContractorController;
 use App\Http\Controllers\api\EmployeeController;
 use App\Http\Controllers\api\ServiceController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,9 +18,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:employees')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
+    Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
+});
+
+Route::get('/teste', [EmployeeController::class, 'teste']);
 
 Route::apiResource('employee', EmployeeController::class);
 Route::apiResource('contractor', ContractorController::class);

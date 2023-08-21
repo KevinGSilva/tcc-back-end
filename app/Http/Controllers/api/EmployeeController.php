@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Repositories\EmployeeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class EmployeeController extends Controller
 {
@@ -68,5 +69,14 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         return $this->employeeRepository->getEmployee()->find($id)->delete();
+    }
+
+    function teste() {
+        $response = Http::post('http://tcc.api.com/api/auth/login', [
+            'email' => 'ruecker.dariana@example.net',
+            'password' => 'password',
+        ]);
+    
+        dd($response);
     }
 }
