@@ -21,6 +21,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('employee', EmployeeController::class);
-Route::apiResource('contractor', ContractorController::class);
-Route::apiResource('employee.service', ServiceController::class)->shallow();
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
+    Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->middleware(['auth:sanctum']);
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::apiResource('employee', EmployeeController::class);
+    Route::apiResource('contractor', ContractorController::class);
+    Route::apiResource('employee.service', ServiceController::class)->shallow();
+});
