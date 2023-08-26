@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'employees',
+        'guard' => 'web',
         'passwords' => 'users',
     ],
 
@@ -40,10 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'employees' => [
-            'driver' => 'sanctum', // Altere para 'sanctum'
-            'provider' => 'employees', // Troque para o nome do seu provider
-        ],
     ],
 
     /*
@@ -67,10 +63,6 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-        ],
-        'employees' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Employee::class,
         ],
 
         // 'users' => [

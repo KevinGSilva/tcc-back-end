@@ -70,13 +70,4 @@ class EmployeeController extends Controller
     {
         return $this->employeeRepository->getEmployee()->find($id)->delete();
     }
-
-    function teste() {
-        $response = Http::post('http://tcc.api.com/api/auth/login', [
-            'email' => 'ruecker.dariana@example.net',
-            'password' => 'password',
-        ]);
-    
-        dd($response);
-    }
 }
