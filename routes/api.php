@@ -24,16 +24,6 @@ Route::middleware('auth:employees')->get('/user', function (Request $request) {
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
-<<<<<<< HEAD
-    Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
-});
-
-Route::get('/teste', [EmployeeController::class, 'teste']);
-
-Route::apiResource('employee', EmployeeController::class);
-Route::apiResource('contractor', ContractorController::class);
-Route::apiResource('employee.service', ServiceController::class)->shallow();
-=======
     Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->middleware(['auth:sanctum']);
 });
 
@@ -42,4 +32,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('contractor', ContractorController::class);
     Route::apiResource('employee.service', ServiceController::class)->shallow();
 });
->>>>>>> 9c6a45c (Rotas de login e logout e protecao nas rotas existentes)
