@@ -4,7 +4,6 @@ use App\Http\Controllers\api\ContractorController;
 use App\Http\Controllers\api\EmployeeController;
 use App\Http\Controllers\api\ServiceController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
