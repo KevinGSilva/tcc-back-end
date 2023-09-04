@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->references('id')->on('employees');
+            $table->foreignId('user_id')->constrained();
             $table->text('name');
             $table->longText('description')->nullable();
             $table->timestamps();
