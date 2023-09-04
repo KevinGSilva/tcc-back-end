@@ -32,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'zipcode',
         'complement',
         'archived',
+        'user_type',
     ];
 
     /**

@@ -28,10 +28,10 @@ class ServiceRepository
     public function store(array $data)
     {
         $validator = Validator::make($data, [
-            'employee_id' => 'required',
+            'user_id' => 'required',
             'name' => 'required|max:255',
         ])->setCustomMessages([
-            'employee_id.required' => 'Ocorreu um erro. Por favor atualize a página e tente novamente!',
+            'user_id.required' => 'Ocorreu um erro. Por favor atualize a página e tente novamente!',
             'name.required' => 'Campo nome é obrigatório!',
             'name.max' => 'O nome não pode ter mais que 255 caracteres!'
         ]);
@@ -57,10 +57,10 @@ class ServiceRepository
     public function update(array $data, int $id)
     {
         $validator = Validator::make($data, [
-            'employee_id' => 'required|max:255',
+            'user_id' => 'required|max:255',
             'name' => 'required|max:255',
         ])->setCustomMessages([
-            'employee_id.required' => 'Ocorreu um erro. Por favor atualize a página e tente novamente!',
+            'user_id.required' => 'Ocorreu um erro. Por favor atualize a página e tente novamente!',
             'name.required' => 'Campo nome é obrigatório!',
             'name.max' => 'O nome não pode ter mais que 255 caracteres!',
         ]);

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\ContractorRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
 class ContractorController extends Controller
 {
-    private $contractorRepository;
+    private $userRepository;
 
-    function __construct(ContractorRepository $contractorRepository)
+    function __construct(UserRepository $userRepository)
     {
-        $this->contractorRepository = $contractorRepository;
+        $this->userRepository = $userRepository;
     }
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class ContractorController extends Controller
      */
     public function index()
     {
-        return $this->contractorRepository->getContractor()->get()->values();
+        return $this->userRepository->getUser()->where('user_type', 2)->get()->values();
     }
 
     /**
@@ -32,7 +32,7 @@ class ContractorController extends Controller
      */
     public function store(Request $request)
     {
-        $contractor = $this->contractorRepository->store($request->all());
+        $contractor = $this->userRepository->store($request->all());
         return $contractor;
     }
 
@@ -44,7 +44,7 @@ class ContractorController extends Controller
      */
     public function show($id)
     {
-        return $this->contractorRepository->getContractor()->find($id);
+        return $this->userRepository->getUser()->find($id);
     }
 
     /**
@@ -56,7 +56,7 @@ class ContractorController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        return $this->contractorRepository->update($request->all(), $id);
+        return $this->userRepository->update($request->all(), $id);
     }
 
     /**
@@ -67,6 +67,6 @@ class ContractorController extends Controller
      */
     public function destroy($id)
     {
-        return $this->contractorRepository->getContractor()->find($id)->delete();
+        return $this->userRepository->getUser()->find($id)->delete();
     }
 }
