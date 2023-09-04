@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\EmployeeRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    private $employeeRepository;
+    private $userRepository;
 
-    function __construct(EmployeeRepository $employeeRepository)
+    function __construct(UserRepository $userRepository)
     {
-        $this->employeeRepository = $employeeRepository;
+        $this->userRepository = $userRepository;
     }
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        return $this->employeeRepository->getEmployee()->get()->values();
+        return $this->userRepository->getUser()->where('user_type', 1)->get()->values();
     }
 
     /**
@@ -32,7 +32,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $employee = $this->employeeRepository->store($request->all());
+        $employee = $this->userRepository->store($request->all());
         return $employee;
     }
 
@@ -44,7 +44,7 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        return $this->employeeRepository->getEmployee()->find($id);
+        return $this->userRepository->getUser()->find($id);
     }
 
     /**
@@ -56,7 +56,7 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        return $this->employeeRepository->update($request->all(), $id);
+        return $this->userRepository->update($request->all(), $id);
     }
 
     /**
@@ -67,6 +67,6 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        return $this->employeeRepository->getEmployee()->find($id)->delete();
+        return $this->userRepository->getUser()->find($id)->delete();
     }
 }
