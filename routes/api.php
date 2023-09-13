@@ -27,6 +27,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
     Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->middleware(['auth:sanctum']);
+    Route::get('/verify-token', function(){
+        return response()->json([
+            "message" => "Valid Token",
+            "status" => "success"
+        ]);
+    })->middleware('auth:sanctum');
 });
 
 Route::post('/register', [RegisterController::class, 'register']);
