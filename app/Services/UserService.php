@@ -14,6 +14,9 @@ class UserService {
     
     public function register($data) {
 
+        $replaces = ['.', '-', '/'];
+        $data['document'] = str_replace($replaces, '', $data['document']);
+
         $user = $this->userRepository->store($data);
 
         return $user;
