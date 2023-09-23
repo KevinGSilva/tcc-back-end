@@ -32,11 +32,20 @@ class UserRepository
      */
     public function store(array $data)
     {
+        $document_type = '';
+        switch(strlen($data['document'])){
+            case 11:
+                $document_type = 'cpf';
+                break;
+            case 14:
+                $document_type = 'cnpj';
+                break;
+        }
         $validator = Validator::make($data, [
             'name' => 'required|max:255',
             'email' => 'required|unique:users|email',            
             'password' => 'required|min:6',
-            'document' => 'required|unique:users|cpf'
+            'document' => 'required|unique:users|cpf',
         ])->setCustomMessages([
             'name.required' => 'Campo nome é obrigatório',
             'name.max' => 'O nome não pode ter mais que 255 caracteres',
@@ -46,7 +55,7 @@ class UserRepository
             'password.required' => 'O campo senha é obrigatório',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres',
             'document.required' => 'O campo Documento é obrigatório',
-            'document.unique' => 'Já existe uma conta com este CPF',
+            'document.unique' => 'Já existe uma conta com este Documento',
             'document.cpf' => 'Informe um CPF válido',
         ]);
 
@@ -80,7 +89,11 @@ class UserRepository
 
             DB::commit();
 
-            return $user;
+            return response()->json([
+                "message" => "Register successfully",
+                "user" => $user,
+                "status" => "success"
+            ]);
         } else {
             DB::rollBack();
         }
