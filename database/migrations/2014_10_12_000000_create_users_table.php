@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('password');
             $table->string('document')->unique();
             $table->string('phone', 25)->nullable();
+            $table->string('phone_whatsapp', 25)->nullable();
+            $table->string('link_instagram')->nullable();
+            $table->string('link_facebook')->nullable();
             $table->string('state', 2)->nullable();
             $table->string('city')->nullable();
             $table->string('neighborhood')->nullable();
