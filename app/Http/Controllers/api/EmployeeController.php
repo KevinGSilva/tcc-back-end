@@ -44,7 +44,11 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        return $this->userRepository->getUser()->find($id);
+        $employee = $this->userRepository->getUser()->with('media')->find($id);
+        return response()->json([
+            "employee" => $employee,
+            "status" => "success"
+        ]);
     }
 
     /**
@@ -56,7 +60,8 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        return $this->userRepository->update($request->all(), $id);
+        $employee = $this->userRepository->update($request->all(), $id);
+        return $employee;
     }
 
     /**
