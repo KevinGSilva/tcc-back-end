@@ -81,8 +81,8 @@ class UserRepository
                 'code' => $code,
             ]);
     
-            if (isset($data['$user_photo']) && !empty($data['$user_photo']) && $user->exists) {
-                $user->addMedia($data['$user_photo'])->toMediaCollection('$user_photo');
+            if (isset($data['cover']) && !empty($data['cover']) && $user->exists) {
+                $user->addMedia($data['cover'])->toMediaCollection('cover');
             }
     
             $this->sendEmailService->sendEmail($user, $code);
@@ -145,11 +145,17 @@ class UserRepository
             $data['password'] = Hash::make($data['password']);
         }
 
-        if (isset($data['user_photo']) && !empty($data['user_photo']) && $user->exists) {
-            $user->addMedia($data['user_photo'])->toMediaCollection('user_photo');
+        if (isset($data['cover']) && !empty($data['cover']) && $user->exists) {
+            $user->addMedia($data['cover'])->toMediaCollection('cover');
         }
         
-        return $user->update($data);
+        $user->update($data);
+
+        return response()->json([
+            "message" => "Register successfully",
+            "user" => $user,
+            "status" => "success"
+        ]);
     }
 
     /**
