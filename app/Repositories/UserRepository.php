@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Services\SendEmailService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -67,10 +68,11 @@ class UserRepository
         }
 
         $data['password'] = Hash::make($data['password']);
+        
+        DB::beginTransaction();
 
         $user = $this->user->create($data);
 
-        DB::beginTransaction();
 
         if ($user)
         {
@@ -80,10 +82,6 @@ class UserRepository
             $user->verificationCodes()->create([
                 'code' => $code,
             ]);
-    
-            if (isset($data['cover']) && !empty($data['cover']) && $user->exists) {
-                $user->addMedia($data['cover'])->toMediaCollection('cover');
-            }
     
             $this->sendEmailService->sendEmail($user, $code);
 
@@ -145,8 +143,20 @@ class UserRepository
             $data['password'] = Hash::make($data['password']);
         }
 
-        if (isset($data['cover']) && !empty($data['cover']) && $user->exists) {
-            $user->addMedia($data['cover'])->toMediaCollection('cover');
+        if (isset($data['thumb']) && !empty($data['thumb']) && $user->exists) {
+            $pattern = '/^data[^,]+,/';
+
+            $base64Data = preg_replace($pattern, '', $data['thumb']);
+
+            $string = $data['thumb'];
+            $inicio = "data:image/";
+            $fim = ";base64,";
+
+            $substring = strstr($string, $inicio);
+            $substring = substr($substring, strlen($inicio));
+            $substring = strstr($substring, $fim, true);
+
+            $user->addMediaFromBase64($base64Data)->setFileName(str_replace(':', '', Carbon::now()->toString()) . '.' . $substring)->toMediaCollection('thumb');
         }
         
         $user->update($data);
