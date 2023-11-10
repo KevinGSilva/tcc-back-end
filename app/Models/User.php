@@ -25,6 +25,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'email',
         'password',
         'document',
+        'description',
+        'services',
         'phone',
         'phone_whatsapp',
         'link_instagram',
@@ -38,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'complement',
         'archived',
         'user_type',
+        'service_flag'
     ];
 
     /**

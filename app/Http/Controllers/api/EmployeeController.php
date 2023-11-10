@@ -19,9 +19,23 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->userRepository->getUser()->where('user_type', 1)->get()->values();
+        $employees = $this->userRepository->getUser()
+                    ->where('user_type', 1)
+                    ->where('services', 'like', '%' . $request->services . '%')
+                    ->with('media')
+                    ->get()->values();
+
+        $employees->each(function ($employee) {
+            $employee->media->each(function ($media) use ($employee) {
+                $employee->url = $media->getFullUrl();
+            });
+        });
+        return response()->json([
+            "employees" => $employees,
+            "status" => "success"
+        ]);
     }
 
     /**
@@ -73,5 +87,24 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         return $this->userRepository->getUser()->find($id)->delete();
+    }
+
+    public function search(Request $request) {
+        $employees = $this->userRepository->getUser()
+                    ->where('user_type', 1)
+                    ->where()
+                    ->with('media')
+                    ->get()->values();
+
+
+        $employees->each(function ($employee) {
+            $employee->media->each(function ($media) use ($employee) {
+                $employee->url = $media->getFullUrl();
+            });
+        });
+        return response()->json([
+            "employees" => $employees,
+            "status" => "success"
+        ]);
     }
 }

@@ -44,7 +44,11 @@ class ContractorController extends Controller
      */
     public function show($id)
     {
-        return $this->userRepository->getUser()->find($id);
+        $contractor = $this->userRepository->getUser()->with('media')->find($id);
+        return response()->json([
+            "contractor" => $contractor,
+            "status" => "success"
+        ]);
     }
 
     /**
@@ -56,7 +60,8 @@ class ContractorController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        return $this->userRepository->update($request->all(), $id);
+        $contractor = $this->userRepository->update($request->all(), $id);
+        return $contractor;
     }
 
     /**

@@ -106,15 +106,15 @@ class UserRepository
     public function update(array $data, int $id)
     {
         $validator = Validator::make($data, [
-            'name' => 'required|max:255',
+            'name' => 'required_if: service_flag, ==, 0|max:255',
             'email' => [
-                'required',
+                'required_if: service_flag, ==, 0',
                 'email',
                 Rule::unique('users')->ignore($id),
             ],
             'password' => 'min:6',
             'document' => [
-                'required',
+                'required_if: service_flag, ==, 0',
                 'cpf',
                 Rule::unique('users')->ignore($id),
             ],
@@ -158,8 +158,8 @@ class UserRepository
 
             $user->addMediaFromBase64($base64Data)->setFileName(str_replace(':', '', Carbon::now()->toString()) . '.' . $substring)->toMediaCollection('thumb');
         }
-        
-        $user->update($data);
+        $dataWithoutServiceFlag = collect($data)->except('service_flag')->toArray();
+        $user->update($dataWithoutServiceFlag);
 
         return response()->json([
             "message" => "Register successfully",
