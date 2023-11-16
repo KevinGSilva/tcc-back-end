@@ -25,6 +25,9 @@ class EmployeeController extends Controller
                     ->where('user_type', 1)
                     ->where('services', 'like', '%' . $request->services . '%')
                     ->with('media')
+                    ->with(['ratingsReceived' => function ($query) {
+                        $query->with('user');
+                    }])
                     ->get()->values();
 
         $employees->each(function ($employee) {
@@ -32,6 +35,19 @@ class EmployeeController extends Controller
                 $employee->url = $media->getFullUrl();
             });
         });
+
+        $rating_average = 0;
+        $employees->each(function ($employee) use (&$rating_average) {
+            $totalRatings = count($employee->ratingsReceived);
+            $sum = 0;
+            $employee->ratingsReceived->each(function ($ratingsReceived) use ($employee, &$sum) {
+                $sum = $sum + $ratingsReceived->value;
+            });
+            $employee->rating_average = $totalRatings > 0 ? $sum / $totalRatings : 0;
+        });
+
+
+
         return response()->json([
             "employees" => $employees,
             "status" => "success"
@@ -58,7 +74,18 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        $employee = $this->userRepository->getUser()->with('media')->find($id);
+        $employee = $this->userRepository->getUser()->with('media')
+        ->with(['ratingsReceived' => function ($query) {
+            $query->with('user');
+        }])->find($id);
+
+        $totalRatings = count($employee->ratingsReceived);
+        $sum = 0;
+        $employee->ratingsReceived->each(function ($ratingsReceived) use ($employee, &$sum) {
+            $sum = $sum + $ratingsReceived->value;
+        });
+        $employee->rating_average = $totalRatings > 0 ? $sum / $totalRatings : 0;
+        
         return response()->json([
             "employee" => $employee,
             "status" => "success"

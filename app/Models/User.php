@@ -71,4 +71,14 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
     {
         $this->addMediaCollection('thumb')->singleFile();
     }
+
+    public function ratingsGiven()
+    {
+        return $this->hasMany(Rating::class, 'user_id');
+    }
+
+    public function ratingsReceived()
+    {
+        return $this->hasMany(Rating::class, 'employee_id');
+    }
 }
