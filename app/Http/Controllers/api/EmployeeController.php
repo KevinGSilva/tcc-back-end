@@ -24,6 +24,7 @@ class EmployeeController extends Controller
         $employees = $this->userRepository->getUser()
                     ->where('user_type', 1)
                     ->where('services', 'like', '%' . $request->services . '%')
+                    ->where('city', 'like', '%' . $request->city . '%')
                     ->with('media')
                     ->with(['ratingsReceived' => function ($query) {
                         $query->with('user');
@@ -76,7 +77,7 @@ class EmployeeController extends Controller
     {
         $employee = $this->userRepository->getUser()->with('media')
         ->with(['ratingsReceived' => function ($query) {
-            $query->with('user');
+            $query->orderBy('created_at', 'DESC')->with('user');
         }])->find($id);
 
         $totalRatings = count($employee->ratingsReceived);
@@ -85,7 +86,7 @@ class EmployeeController extends Controller
             $sum = $sum + $ratingsReceived->value;
         });
         $employee->rating_average = $totalRatings > 0 ? $sum / $totalRatings : 0;
-        
+
         return response()->json([
             "employee" => $employee,
             "status" => "success"
