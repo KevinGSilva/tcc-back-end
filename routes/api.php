@@ -6,6 +6,7 @@ use App\Http\Controllers\api\ServiceController;
 use App\Http\Controllers\Auth\MakeCodeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\api\FavouriteController;
+use App\Http\Controllers\api\RatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,5 +44,8 @@ Route::middleware(['auth:sanctum','email_verified'])->group(function () {
     Route::apiResource('employee', EmployeeController::class);
     Route::apiResource('contractor', ContractorController::class);
     Route::apiResource('employee.service', ServiceController::class)->shallow();
+    Route::apiResource('rating', RatingController::class);
     Route::apiResource('contractor.favourite', FavouriteController::class)->shallow();
+
+    Route::get('/rating-existed/{employee_id}', [RatingController::class, 'ratingExisted']);
 });
