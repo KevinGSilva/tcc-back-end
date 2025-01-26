@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware('can:admin')->get('/admin', function () {
+    return view('admin.dashboard');
 });

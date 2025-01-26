@@ -6,6 +6,7 @@ use App\Http\Controllers\api\ServiceController;
 use App\Http\Controllers\Auth\MakeCodeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\api\FavouriteController;
+use App\Http\Controllers\api\RatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
     Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->middleware(['auth:sanctum']);
+    Route::get('/verify-token', function(){
+        return response()->json([
+            "message" => "Valid Token",
+            "status" => "success"
+        ]);
+    })->middleware('auth:sanctum');
 });
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -37,5 +44,8 @@ Route::middleware(['auth:sanctum','email_verified'])->group(function () {
     Route::apiResource('employee', EmployeeController::class);
     Route::apiResource('contractor', ContractorController::class);
     Route::apiResource('employee.service', ServiceController::class)->shallow();
+    Route::apiResource('rating', RatingController::class);
     Route::apiResource('contractor.favourite', FavouriteController::class)->shallow();
+
+    Route::get('/rating-existed/{employee_id}', [RatingController::class, 'ratingExisted']);
 });

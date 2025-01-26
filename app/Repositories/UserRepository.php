@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Services\SendEmailService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -32,11 +33,20 @@ class UserRepository
      */
     public function store(array $data)
     {
+        $document_type = '';
+        switch(strlen($data['document'])){
+            case 11:
+                $document_type = 'cpf';
+                break;
+            case 14:
+                $document_type = 'cnpj';
+                break;
+        }
         $validator = Validator::make($data, [
             'name' => 'required|max:255',
             'email' => 'required|unique:users|email',            
             'password' => 'required|min:6',
-            'document' => 'required|unique:users|cpf'
+            'document' => 'required|unique:users|cpf',
         ])->setCustomMessages([
             'name.required' => 'Campo nome é obrigatório',
             'name.max' => 'O nome não pode ter mais que 255 caracteres',
@@ -46,7 +56,7 @@ class UserRepository
             'password.required' => 'O campo senha é obrigatório',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres',
             'document.required' => 'O campo Documento é obrigatório',
-            'document.unique' => 'Já existe uma conta com este CPF',
+            'document.unique' => 'Já existe uma conta com este Documento',
             'document.cpf' => 'Informe um CPF válido',
         ]);
 
@@ -58,10 +68,11 @@ class UserRepository
         }
 
         $data['password'] = Hash::make($data['password']);
+        
+        DB::beginTransaction();
 
         $user = $this->user->create($data);
 
-        DB::beginTransaction();
 
         if ($user)
         {
@@ -72,15 +83,15 @@ class UserRepository
                 'code' => $code,
             ]);
     
-            if (isset($data['$user_photo']) && !empty($data['$user_photo']) && $user->exists) {
-                $user->addMedia($data['$user_photo'])->toMediaCollection('$user_photo');
-            }
-    
             $this->sendEmailService->sendEmail($user, $code);
 
             DB::commit();
 
-            return $user;
+            return response()->json([
+                "message" => "Register successfully",
+                "user" => $user,
+                "status" => "success"
+            ]);
         } else {
             DB::rollBack();
         }
@@ -95,15 +106,15 @@ class UserRepository
     public function update(array $data, int $id)
     {
         $validator = Validator::make($data, [
-            'name' => 'required|max:255',
+            'name' => 'required_if: service_flag, ==, 0|max:255',
             'email' => [
-                'required',
+                'required_if: service_flag, ==, 0',
                 'email',
                 Rule::unique('users')->ignore($id),
             ],
             'password' => 'min:6',
             'document' => [
-                'required',
+                'required_if: service_flag, ==, 0',
                 'cpf',
                 Rule::unique('users')->ignore($id),
             ],
@@ -132,11 +143,29 @@ class UserRepository
             $data['password'] = Hash::make($data['password']);
         }
 
-        if (isset($data['user_photo']) && !empty($data['user_photo']) && $user->exists) {
-            $user->addMedia($data['user_photo'])->toMediaCollection('user_photo');
+        if (isset($data['thumb']) && !empty($data['thumb']) && $user->exists) {
+            $pattern = '/^data[^,]+,/';
+
+            $base64Data = preg_replace($pattern, '', $data['thumb']);
+
+            $string = $data['thumb'];
+            $inicio = "data:image/";
+            $fim = ";base64,";
+
+            $substring = strstr($string, $inicio);
+            $substring = substr($substring, strlen($inicio));
+            $substring = strstr($substring, $fim, true);
+
+            $user->addMediaFromBase64($base64Data)->setFileName(str_replace(':', '', Carbon::now()->toString()) . '.' . $substring)->toMediaCollection('thumb');
         }
-        
-        return $user->update($data);
+        $dataWithoutServiceFlag = collect($data)->except('service_flag')->toArray();
+        $user->update($dataWithoutServiceFlag);
+
+        return response()->json([
+            "message" => "Register successfully",
+            "user" => $user,
+            "status" => "success"
+        ]);
     }
 
     /**

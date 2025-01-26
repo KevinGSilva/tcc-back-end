@@ -19,9 +19,40 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->userRepository->getUser()->where('user_type', 1)->get()->values();
+        $employees = $this->userRepository->getUser()
+                    ->where('user_type', 1)
+                    ->where('services', 'like', '%' . $request->services . '%')
+                    ->where('city', 'like', '%' . $request->city . '%')
+                    ->with('media')
+                    ->with(['ratingsReceived' => function ($query) {
+                        $query->with('user');
+                    }])
+                    ->get()->values();
+
+        $employees->each(function ($employee) {
+            $employee->media->each(function ($media) use ($employee) {
+                $employee->url = $media->getFullUrl();
+            });
+        });
+
+        $rating_average = 0;
+        $employees->each(function ($employee) use (&$rating_average) {
+            $totalRatings = count($employee->ratingsReceived);
+            $sum = 0;
+            $employee->ratingsReceived->each(function ($ratingsReceived) use ($employee, &$sum) {
+                $sum = $sum + $ratingsReceived->value;
+            });
+            $employee->rating_average = $totalRatings > 0 ? $sum / $totalRatings : 0;
+        });
+
+
+
+        return response()->json([
+            "employees" => $employees,
+            "status" => "success"
+        ]);
     }
 
     /**
@@ -44,7 +75,22 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        return $this->userRepository->getUser()->find($id);
+        $employee = $this->userRepository->getUser()->with('media')
+        ->with(['ratingsReceived' => function ($query) {
+            $query->orderBy('created_at', 'DESC')->with('user');
+        }])->find($id);
+
+        $totalRatings = count($employee->ratingsReceived);
+        $sum = 0;
+        $employee->ratingsReceived->each(function ($ratingsReceived) use ($employee, &$sum) {
+            $sum = $sum + $ratingsReceived->value;
+        });
+        $employee->rating_average = $totalRatings > 0 ? $sum / $totalRatings : 0;
+
+        return response()->json([
+            "employee" => $employee,
+            "status" => "success"
+        ]);
     }
 
     /**
@@ -56,7 +102,8 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        return $this->userRepository->update($request->all(), $id);
+        $employee = $this->userRepository->update($request->all(), $id);
+        return $employee;
     }
 
     /**
@@ -68,5 +115,24 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         return $this->userRepository->getUser()->find($id)->delete();
+    }
+
+    public function search(Request $request) {
+        $employees = $this->userRepository->getUser()
+                    ->where('user_type', 1)
+                    ->where()
+                    ->with('media')
+                    ->get()->values();
+
+
+        $employees->each(function ($employee) {
+            $employee->media->each(function ($media) use ($employee) {
+                $employee->url = $media->getFullUrl();
+            });
+        });
+        return response()->json([
+            "employees" => $employees,
+            "status" => "success"
+        ]);
     }
 }

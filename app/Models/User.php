@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +25,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'document',
+        'description',
+        'services',
         'phone',
+        'phone_whatsapp',
+        'link_instagram',
+        'link_facebook',
         'state',
         'city',
         'neighborhood',
@@ -33,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'complement',
         'archived',
         'user_type',
+        'service_flag'
     ];
 
     /**
@@ -57,5 +65,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function verificationCodes()
     {
         return $this->hasMany(VerificationCode::class);
+    }
+    
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('thumb')->singleFile();
+    }
+
+    public function ratingsGiven()
+    {
+        return $this->hasMany(Rating::class, 'user_id');
+    }
+
+    public function ratingsReceived()
+    {
+        return $this->hasMany(Rating::class, 'employee_id');
     }
 }

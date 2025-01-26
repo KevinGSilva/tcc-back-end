@@ -31,9 +31,12 @@ class RegisterController extends Controller
 
         if($code == $userCode->code ){
             $user->markEmailAsVerified();
-            return response()->json(['message' => 'Email verified']);
+            return response()->json([
+                "message" => "Email verificado",
+                "status" => "success"
+            ]);
         }
 
-        return response()->json(['message' => 'Invalid verification code'], 400);
+        return response()->json(['message' => 'Código inválido'], 400);
     }
 }
